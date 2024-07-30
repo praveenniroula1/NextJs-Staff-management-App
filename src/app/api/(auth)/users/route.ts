@@ -3,11 +3,19 @@ import User from "@/app/db/models/userModels"
 import { NextResponse } from "next/server"
 import { json } from "stream/consumers"
 
-export const GET = async () => {
+export const GET = async (request:Request) => {
   try {
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get("userId")
+   
     await dbConfig()
-    const users = await User.find();
-    return new NextResponse(JSON.stringify(users), { status: 200 })
+    if(searchParams && userId){
+      const users = await User.findById(userId);
+      return new NextResponse(JSON.stringify(users), { status: 200 })
+    }else{
+      const users = await User.find();
+      return new NextResponse(JSON.stringify(users), { status: 200 })
+    }
 
   } catch (error: any) {
     return new NextResponse("hahahaha You have a problem" + error.message, { status: 500 })
@@ -80,3 +88,5 @@ export const DELETE = async (request: Request) => {
     return new NextResponse("Error in deleting the user" + error.message)
   }
 }
+
+
