@@ -2,25 +2,15 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import HandleDelete from '../Components/HandleDelete';
-import HandleEdit from '../Components/HandleEdit';
+import HandleEdit from "@/app/Components/HandleEdit"
 
 const AllUsers = () => {
   const [allUser, setAllUsers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOnEdit = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/users');
-        console.log('Response:', response);
         setAllUsers(response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -74,13 +64,8 @@ const AllUsers = () => {
                   {user.password}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <button
-                    onClick={handleOnEdit}
-                    className="bg-yellow-500 text-white font-bold m-3 py-2 px-4 rounded hover:bg-yellow-600 transition-colors duration-300"
-                  >
-                    Edit
-                  </button>
-                  <HandleEdit isOpen={isModalOpen} closeModal={closeModal} userId={user._id}/>
+                 
+                  <HandleEdit userId={user._id}/>
                   <HandleDelete userId={user._id} />
                 </td>
               </tr>

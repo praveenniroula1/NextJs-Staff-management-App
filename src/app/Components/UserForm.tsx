@@ -17,15 +17,12 @@ const UserForm = () => {
       ...form,
       [name]: value,
     });
-    console.log(form);
   };
 
   const handleOnClick = async (e: any) => {
     e.preventDefault();
-    console.log(form);
    try {
     const response = await axios.post("http://localhost:3000/api/users", form);
-    console.log(response.data);
     setForm(formData)
    } catch (error:any) {
     console.log(error.message)
@@ -78,18 +75,13 @@ const UserForm = () => {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline shadow-lg transform transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
               type="button"
               onClick={handleOnClick}
             >
               Add in the system
             </button>
-            <a
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-              href="#"
-            >
-              Have they Forgotton their Password?
-            </a>
+            
           </div>
           <Link href="/users">
       <button className="bg-green-500 m-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transform transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
