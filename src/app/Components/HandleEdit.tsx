@@ -1,7 +1,8 @@
+"use client";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-const HandleEdit = ({ userId }: any) => {
+const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
   const [userDetails, setUserDetails] = useState({
     _id: "",
     username: "",
@@ -17,34 +18,37 @@ const HandleEdit = ({ userId }: any) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await axios.get(
-        `http://localhost:3000/api/users?userId=${userId}`
-      );
-      setUserDetails(response.data);
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/users?userId=${userId}`
+        );
+        setUserDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
     };
     getUser();
   }, [userId]);
 
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
-    setUserDetails({
-      ...userDetails,
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
       [name]: value,
-    });
+    }));
   };
 
   const handleOnSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.patch(
-        `http://localhost:3000/api/users`,
-        userDetails
-      );
-
+      await axios.patch(`http://localhost:3000/api/users`, userDetails);
+      if (onUpdate) {
+        onUpdate();
+        updated();
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating user:", error);
     }
-
     setIsOpen(false);
   };
 

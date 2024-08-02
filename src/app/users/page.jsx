@@ -1,28 +1,30 @@
-"use client"
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import HandleDelete from '../Components/HandleDelete';
-import HandleEdit from "@/app/Components/HandleEdit"
+"use client";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import HandleDelete from "../Components/HandleDelete";
+import HandleEdit from "../Components/HandleEdit";
+
 
 const AllUsers = () => {
-  const [allUser, setAllUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/users");
+      setAllUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/users');
-        setAllUsers(response.data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-    fetchUser();
-  }, []);
+    fetchUsers();
+  }, [updated]);
 
   return (
     <>
       <div className="flex justify-center font-bold m-4 text-4xl bg-purple-500 p-2">
-        You have {allUser.length} Staff at your company.
+        You have {allUsers.length} Staff at your company.
       </div>
       <div className="overflow-x-auto max-w-7xl mx-auto py-8">
         <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
@@ -46,7 +48,7 @@ const AllUsers = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {allUser?.map((user: any) => (
+            {allUsers.map((user) => (
               <tr
                 key={user._id}
                 className="hover:bg-gray-100 transition-colors duration-300"
@@ -64,8 +66,12 @@ const AllUsers = () => {
                   {user.password}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                 
-                  <HandleEdit userId={user._id}/>
+                  <HandleEdit
+                    userId={user._id}
+                    onUpdate={fetchUsers}
+                    user={user}
+                    updated={() => setUpdated((prev) => !prev)}
+                  />
                   <HandleDelete userId={user._id} />
                 </td>
               </tr>
