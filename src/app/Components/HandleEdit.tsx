@@ -1,36 +1,31 @@
-"use client";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+"use client"
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
-const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
+const HandleEdit = ({ user, onUpdate }:any) => {
   const [userDetails, setUserDetails] = useState({
-    _id: "",
-    username: "",
-    email: "",
-    password: "",
+    id: user._id,
+    username: user.username,
+    email: user.email,
+    password: user.password,
   });
 
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setUserDetails({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      password: user.password,
+    });
+  }, [user]);
 
   const handleOnEdit = () => {
     setIsOpen(true);
   };
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/users?userId=${userId}`
-        );
-        setUserDetails(response.data);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-    getUser();
-  }, [userId]);
-
-  const handleOnChange = (e: any) => {
+  const handleOnChange = (e:any) => {
     const { name, value } = e.target;
     setUserDetails((prevDetails) => ({
       ...prevDetails,
@@ -38,18 +33,14 @@ const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
     }));
   };
 
-  const handleOnSubmit = async (e: any) => {
+  const handleOnSubmit = async (e:any) => {
     e.preventDefault();
     try {
-      await axios.patch(`http://localhost:3000/api/users`, userDetails);
-      if (onUpdate) {
-        onUpdate();
-        updated();
-      }
+      await onUpdate(userDetails); // Call the update function passed from the parent
+      setIsOpen(false); // Close the modal after update
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error submitting form:", error);
     }
-    setIsOpen(false);
   };
 
   return (
@@ -58,7 +49,7 @@ const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
         {isOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded shadow-lg w-80">
-              <h2 className="text-xl font-bold mb-4">Edit Request Form</h2>
+              <h2 className="text-xl font-bold mb-4">Edit User</h2>
               <form onSubmit={handleOnSubmit}>
                 <div className="mb-4">
                   <label
@@ -69,9 +60,26 @@ const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
                   </label>
                   <input
                     disabled
-                    value={userId}
+                    value={user._id}
                     type="text"
                     id="id"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </label>
+                  <input
+                  disabled
+                    onChange={handleOnChange}
+                    value={userDetails.email}
+                    type="email"
+                    name="email"
+                    id="email"
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
@@ -91,22 +99,7 @@ const HandleEdit = ({ userId, onUpdate, user, updated }: any) => {
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email
-                  </label>
-                  <input
-                    onChange={handleOnChange}
-                    value={userDetails.email}
-                    type="email"
-                    name="email"
-                    id="email"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
+               
                 <div className="mb-4">
                   <label
                     htmlFor="password"

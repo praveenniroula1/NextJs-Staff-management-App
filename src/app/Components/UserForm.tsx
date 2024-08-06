@@ -2,6 +2,7 @@
 import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const UserForm = () => {
   const formData = {
@@ -24,6 +25,7 @@ const UserForm = () => {
    try {
     const response = await axios.post("http://localhost:3000/api/users", form);
     setForm(formData)
+    toast.success("The new staff details have been successfully stored!!!")
    } catch (error:any) {
     console.log(error.message)
    }

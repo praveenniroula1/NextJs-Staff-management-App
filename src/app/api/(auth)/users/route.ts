@@ -2,16 +2,25 @@ import dbConfig from "@/app/db/dbConfig"
 import User from "@/app/db/models/userModels"
 import { NextResponse } from "next/server"
 
-export const GET = async (request:Request) => {
+export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get("userId")
-   
+    const search = searchParams.get("search")
+    const query = search
+      ? {
+        $or: [
+          { username: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+        ],
+      }
+      : {};
+
     await dbConfig()
-    if(searchParams && userId){
-      const users = await User.findById(userId);
+    if (searchParams || userId) {
+      const users = await User.find(query);
       return new NextResponse(JSON.stringify(users), { status: 200 })
-    }else{
+    } else {
       const users = await User.find();
       return new NextResponse(JSON.stringify(users), { status: 200 })
     }
@@ -38,51 +47,61 @@ export const POST = async (request: Request) => {
   }
 };
 
-export const PATCH = async (request: Request) => {
+export async function PATCH(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    console.log(searchParams)
+    const userId = searchParams.get("userId")
+
+    // Extract the updated user details from the request body
     const body = await request.json();
-    const { _id, email, username, password } = body;
+    const { email, username, password } = body;
 
     await dbConfig();
 
-    if (!_id || !email || !username || !password) {
-      return new NextResponse(JSON.stringify({ message: "Missing userId or newUsername" }), { status: 400 })
+    // Validate input
+    if (!userId || !email || !username || !password) {
+      return NextResponse.json({ message: "Missing user ID, email, username, or password" }, { status: 400 });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(_id, {
-      email: email,
-      username: username,
-      password: password,
-    }, { new: true })
+    // Update the user
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { email, username, password },
+      { new: true }
+    );
 
+    // Check if user was updated successfully
     if (updatedUser) {
-      return new NextResponse(JSON.stringify({ message: "Successfully updated", updatedUser }), { status: 400 })
-
+      return NextResponse.json({ message: "Successfully updated", updatedUser }, { status: 200 });
+    } else {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
   } catch (error: any) {
-    return new NextResponse("Error in creating user" + error.message, {
-      status: 500,
-    });
+    return NextResponse.json({ message: "Error updating user: " + error.message }, { status: 500 });
   }
-};
+}
 
 export const DELETE = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url)
+    console.log(searchParams)
     const userId = searchParams.get("userId")
-   
-    if (!userId) {
-      return new NextResponse("Invalid userId")
-    }
-    await dbConfig()
-    const deletedUser = await User.findByIdAndDelete(userId)
-    if (deletedUser) {
-      return new NextResponse("Successfully deleted the user")
-    }
-  }
-  catch (error: any) {
-    return new NextResponse("Error in deleting the user" + error.message)
-  }
-}
 
+    if (!userId) {
+      return NextResponse.json({ error: 'Invalid userId' }, { status: 400 });
+    }
+
+    await dbConfig();
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (deletedUser) {
+      return NextResponse.json({ message: 'Successfully deleted the user' }, { status: 200 });
+    } else {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Error in deleting the user: ' + error.message }, { status: 500 });
+  }
+};

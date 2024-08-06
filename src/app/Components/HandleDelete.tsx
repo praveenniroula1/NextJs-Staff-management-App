@@ -1,19 +1,18 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import toast from "react-hot-toast";
 
-const HandleDelete = ({ userId }: any) => {
-  const [user,setUser]=useState([])
-  const deleteUser = async () => {
-    await axios.delete(`http://localhost:3000/api/users?userId=${userId}`);
+const HandleDelete = ({ userId, onDelete }:any) => {
+  const deleteUser = async (e:any) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/users?userId=${userId}`);
+
+      onDelete(); // Call the delete function passed from the parent
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await axios.get(`http://localhost:3000/api/users`);
-      setUser(response.data)
-    };
-    fetchUser();
-  }, [userId]);
   return (
     <button
       onClick={deleteUser}
