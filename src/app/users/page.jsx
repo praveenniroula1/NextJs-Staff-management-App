@@ -32,7 +32,7 @@ const AllUsers = () => {
       );
       toast.success("Successfully Updated the details!!!");
 
-      fetchUsers(); // Re-fetch users to update the list
+      fetchUsers(); 
     } catch (error) {
       console.error("Error updating user:", error);
     }
@@ -42,7 +42,7 @@ const AllUsers = () => {
     try {
       toast.success("Successfully Deleted the User!!!");
 
-      fetchUsers(); // Re-fetch users to update the list
+      fetchUsers(); 
     } catch (error) {
       console.error("Error deleting user:", error);
     }

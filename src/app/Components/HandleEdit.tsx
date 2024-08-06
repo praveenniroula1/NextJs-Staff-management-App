@@ -36,8 +36,8 @@ const HandleEdit = ({ user, onUpdate }:any) => {
   const handleOnSubmit = async (e:any) => {
     e.preventDefault();
     try {
-      await onUpdate(userDetails); // Call the update function passed from the parent
-      setIsOpen(false); // Close the modal after update
+      await onUpdate(userDetails); 
+      setIsOpen(false); 
     } catch (error) {
       console.error("Error submitting form:", error);
     }

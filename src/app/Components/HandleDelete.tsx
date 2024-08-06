@@ -7,7 +7,7 @@ const HandleDelete = ({ userId, onDelete }:any) => {
     try {
       await axios.delete(`http://localhost:3000/api/users?userId=${userId}`);
 
-      onDelete(); // Call the delete function passed from the parent
+      onDelete(); 
     } catch (error) {
       console.error("Error deleting user:", error);
     }
